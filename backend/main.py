@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from backend.logger import setup_logging
 from backend.config import settings
@@ -22,7 +25,12 @@ app = FastAPI(
     version=API_VERSION
 )
 
-# Enable CORS
+# Rate limiter (M1033 - System Access Control: limit request rates to prevent brute-force)
+limiter = Limiter(key_func=get_remote_address, default_limits=[f"{settings.RATE_LIMIT_PER_MINUTE}/minute"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Enable CORS with restricted origins (M1033 - System Access Control)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,

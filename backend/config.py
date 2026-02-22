@@ -28,7 +28,7 @@ class Settings:
     # API Configuration
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
     API_PORT: int = int(os.getenv("API_PORT", "8000"))
-    API_DEBUG: bool = os.getenv("API_DEBUG", "True").lower() == "true"
+    API_DEBUG: bool = os.getenv("API_DEBUG", "False").lower() == "true"
     
     # Gemini/LLM Configuration
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
@@ -42,8 +42,15 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_FILE: Optional[str] = os.getenv("LOG_FILE", None)
     
-    # CORS
-    CORS_ORIGINS: list = ["*"]
+    # CORS - restrict to explicit origins; use "*" only for local dev via env override
+    CORS_ORIGINS: list = [
+        o.strip()
+        for o in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+        if o.strip() and o.strip().startswith(("http://", "https://"))
+    ]
+
+    # Rate limiting (M1033 - System Access Control)
+    RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
     
     @classmethod
     def validate(cls) -> bool:
@@ -73,6 +80,8 @@ class Settings:
         logger.info(f"Gemini API Key: {'***' if cls.GEMINI_API_KEY else 'NOT SET'}")
         logger.info(f"Log Level: {cls.LOG_LEVEL}")
         logger.info(f"Data Directory: {cls.DATA_DIR}")
+        logger.info(f"CORS Origins: {cls.CORS_ORIGINS}")
+        logger.info(f"Rate Limit: {cls.RATE_LIMIT_PER_MINUTE}/minute")
         logger.info("=" * 30)
 
 
