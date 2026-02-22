@@ -1,3 +1,9 @@
+"""MITRE ATT&CK classifier agent powered by Google Gemini.
+
+Provides functions to classify honeypot logs against the MITRE ATT&CK
+framework and correlate sequences of events into multi-stage attack chains.
+"""
+
 import asyncio
 import json
 import os
@@ -33,6 +39,17 @@ _cached_mitre_data = None
 # Utilities
 # -------------------------
 def get_mitre_data(path: str = "data/mitre_attack.json") -> Optional[Any]:
+    """Load and cache the MITRE ATT&CK reference data from disk.
+
+    Searches several candidate file paths so the function works regardless
+    of the working directory.
+
+    Args:
+        path: Primary path to the MITRE JSON file.
+
+    Returns:
+        The parsed JSON data, or ``None`` if the file cannot be found or read.
+    """
     global _cached_mitre_data
     if _cached_mitre_data is not None:
         return _cached_mitre_data
@@ -80,7 +97,17 @@ async def logs_normalization(logs: Any) -> Any:
     return logs
 
 def clean_llm_json(text: str) -> str:
-    """Remove code block wrappers and whitespace from LLM output."""
+    """Strip markdown code-block wrappers and surrounding whitespace from LLM output.
+
+    LLMs sometimes wrap JSON output in ``json ... `` markers; this
+    helper removes those so the result can be parsed with ``json.loads``.
+
+    Args:
+        text: Raw text returned by the LLM.
+
+    Returns:
+        Cleaned text suitable for JSON parsing.
+    """
     text = text.strip()
     text = re.sub(r"^```json\s*", "", text)
     text = re.sub(r"^```\s*", "", text)
@@ -92,7 +119,20 @@ def clean_llm_json(text: str) -> str:
 # -------------------------
 
 async def classify_with_gemini(logs: List[dict], mitre_data: Any) -> Optional[List[dict]]:
-    """Send logs to Gemini for individual MITRE classification."""
+    """Send honeypot logs to Google Gemini for individual MITRE ATT&CK classification.
+
+    Constructs a prompt containing the logs and reference MITRE data, calls the
+    Gemini model, and parses the structured JSON response.  Each returned item
+    is post-processed to include attacker IP and a flattened summary for
+    dashboard display.
+
+    Args:
+        logs: List of normalised honeypot log dicts.
+        mitre_data: Parsed MITRE ATT&CK reference JSON.
+
+    Returns:
+        A list of classification result dicts, or ``None`` on failure.
+    """
     if not client:
         logger.error("Metra Classifier: Gemini client not initialized.")
         return None
@@ -156,7 +196,15 @@ async def classify_with_gemini(logs: List[dict], mitre_data: Any) -> Optional[Li
         return None
 
 async def correlate_with_gemini(logs: List[dict]) -> Optional[dict]:
-    """Analyze the sequence of logs to correlate them into an attack chain."""
+    """Analyse a sequence of logs with Gemini to reconstruct a multi-stage attack chain.
+
+    Args:
+        logs: List of honeypot log dicts to correlate.
+
+    Returns:
+        A dict describing the attack chain (type ``attack_chain``), or ``None``
+        on failure.
+    """
     if not client:
         return None
 
@@ -194,7 +242,17 @@ async def correlate_with_gemini(logs: List[dict]) -> Optional[dict]:
         return None
 
 async def classify_logs(logs: List[dict]) -> Optional[List[dict]]:
-    """High-level entry point for batch classification."""
+    """High-level entry point for batch classification.
+
+    Loads MITRE reference data, normalises the incoming logs, and delegates
+    to :func:`classify_with_gemini`.
+
+    Args:
+        logs: Raw honeypot log dicts.
+
+    Returns:
+        A list of classification results, or ``None`` if MITRE data is unavailable.
+    """
     logger.info("Metra Classifier: classify_logs called")
     mitre_data = get_mitre_data()
     if not mitre_data:
@@ -204,7 +262,16 @@ async def classify_logs(logs: List[dict]) -> Optional[List[dict]]:
     return await classify_with_gemini(normalized, mitre_data)
 
 async def correlate_logs(logs: List[dict]) -> Optional[dict]:
-    """High-level entry point for multi-stage attack correlation."""
+    """High-level entry point for multi-stage attack correlation.
+
+    Normalises the incoming logs and delegates to :func:`correlate_with_gemini`.
+
+    Args:
+        logs: Raw honeypot log dicts.
+
+    Returns:
+        An attack-chain dict, or ``None`` on failure.
+    """
     logger.info("Metra Classifier: correlate_logs called")
     normalized = await logs_normalization(logs)
     return await correlate_with_gemini(normalized)
@@ -217,7 +284,14 @@ async def run_classification_workflow(
     honeypot_logs_path: str,
     mitre_attack_path: str
 ):
-    """CLI workflow for testing."""
+    """CLI workflow that reads logs from disk, classifies them, and prints the results.
+
+    This is a convenience function intended for local testing and development.
+
+    Args:
+        honeypot_logs_path: Path to the honeypot logs JSON file.
+        mitre_attack_path: Path to the MITRE ATT&CK reference JSON file.
+    """
     logger.info("Starting classification workflow")
 
     honeypot_logs = await read_from_json(honeypot_logs_path)
@@ -233,6 +307,7 @@ async def run_classification_workflow(
         print(json.dumps(corr, indent=4))
 
 async def runner():
+    """Default CLI entry point that runs the classification workflow with example data."""
     logger.info("Metra Classifier: Runner started")
     # Example paths based on the new structure
     await run_classification_workflow(

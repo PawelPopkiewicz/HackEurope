@@ -29,6 +29,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
+    """Health-check endpoint that returns the service status and available API routes."""
     return {
         "status": "online",
         "service": "Pen Test Agent Backend",

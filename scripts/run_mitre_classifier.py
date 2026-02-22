@@ -1,3 +1,5 @@
+"""Convenience script that runs the MITRE ATT&CK classifier via ``uv run``."""
+
 import os
 import sys
 import subprocess as sp

@@ -1,3 +1,5 @@
+"""Central API router that aggregates all sub-routers under the ``/api/v1`` prefix."""
+
 from fastapi import APIRouter
 from backend.api import logs, classification, fixer, dashboard
 

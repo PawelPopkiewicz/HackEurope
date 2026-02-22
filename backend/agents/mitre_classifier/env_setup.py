@@ -1,3 +1,9 @@
+"""Environment configuration for the MITRE ATT&CK classifier agent.
+
+Loads API keys from ``.env`` and sets up the shared logger used by the
+classifier module.
+"""
+
 from pathlib import Path
 from dotenv import load_dotenv
 import os

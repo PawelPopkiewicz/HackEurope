@@ -1,3 +1,5 @@
+"""Diagnostic script to verify the Gemini API key, imports, and classifier functionality."""
+
 import asyncio
 import os
 import sys
@@ -8,6 +10,7 @@ from dotenv import load_dotenv
 sys.path.append(os.getcwd())
 
 async def diagnose():
+    """Run a series of checks (env vars, imports, test classification) and print results."""
     print("--- Environment Diagnosis ---")
     print(f"Python Version: {sys.version}")
     print(f"Current Working Directory: {os.getcwd()}")

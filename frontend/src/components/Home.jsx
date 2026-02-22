@@ -1,6 +1,10 @@
 import React from 'react';
 import { Shield, Zap, Lock, Globe, Terminal } from 'lucide-react';
 
+/**
+ * Feature highlight card used on the Home landing page.
+ * @param {{ icon: React.ElementType, title: string, description: string }} props
+ */
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <div className="bg-zinc-950 border border-zinc-900 p-6 rounded-xl hover:border-zinc-800 transition-colors group">
     <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
@@ -11,6 +15,7 @@ const FeatureCard = ({ icon: Icon, title, description }) => (
   </div>
 );
 
+/** Landing page component with hero section, feature cards, and summary stats. */
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-8 text-center bg-zinc-950/20">
