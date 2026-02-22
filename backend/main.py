@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Pen Test Agent Backend",
     description="Modular backend for Honeypot monitoring, threat classification, and AI remediation.",
-    version="1.0.0"
+    version="1.1.0"
 )
 
 # Enable CORS for frontend development
