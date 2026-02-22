@@ -6,6 +6,7 @@ def create_github_issue(
     title: str,
     body: str,
     assignees: list[str] | None = None,
+    labels: list[str] | None = None,
     base_branch: str = "main",
     custom_instructions: str = "",
     custom_agent: str = "",
@@ -21,6 +22,7 @@ def create_github_issue(
         "title": title,
         "body": body,
         "assignees": assignees or ["copilot-swe-agent[bot]"],
+        "labels": labels or ["honeypot"],
         "agent_assignment": {
             "target_repo": f"{owner}/{repo}",
             "base_branch": base_branch,
