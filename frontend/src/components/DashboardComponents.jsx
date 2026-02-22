@@ -74,6 +74,18 @@ export const RiskItem = ({ data, active, onClick }) => (
         {data.summary}
       </div>
     )}
+    {active && data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="mt-1 space-y-1">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">MITRE ATT&amp;CK</div>
+        {data.mitre_attack.map((m, i) => <MitreItem key={m.technique_id || i} data={m} />)}
+      </div>
+    )}
+    {active && data?.mitigations && data.mitigations.length > 0 && (
+      <div className="mt-1 space-y-1">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Fix Suggestions</div>
+        {data.mitigations.map((m, i) => <MitigationItem key={m.mitigation_id || i} data={m} />)}
+      </div>
+    )}
   </div>
 );
 
