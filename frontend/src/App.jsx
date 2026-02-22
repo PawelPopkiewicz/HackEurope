@@ -16,6 +16,126 @@ import FixerDashboard from './components/FixerDashboard';
 const initialNodes = [];
 const initialEdges = [];
 
+/**
+ * Build ReactFlow nodes and edges from a MITRE risk score result.
+ * Layout: Event node → Technique nodes → Mitigation nodes
+ */
+function buildMitreFlowGraph(risk) {
+  if (!risk) return { nodes: [], edges: [] };
+
+  const nodes = [];
+  const edges = [];
+
+  const severityColor = {
+    CRITICAL: '#ef4444',
+    HIGH: '#f97316',
+    MEDIUM: '#f59e0b',
+    LOW: '#3b82f6',
+  };
+  const eventColor = severityColor[risk.severity] || '#6b7280';
+
+  // Central event node
+  nodes.push({
+    id: 'event',
+    type: 'default',
+    position: { x: 300, y: 0 },
+    data: { label: `${risk.eventid || 'EVENT'}\n[${risk.severity || '?'} · ${risk.score ?? '?'}]` },
+    style: {
+      background: '#18181b',
+      border: `2px solid ${eventColor}`,
+      color: eventColor,
+      borderRadius: 8,
+      fontSize: 10,
+      fontWeight: 'bold',
+      padding: '8px 12px',
+      minWidth: 160,
+      textAlign: 'center',
+      whiteSpace: 'pre-line',
+    },
+  });
+
+  const techniques = risk.mitre_attack || [];
+  const mitigations = risk.mitigations || [];
+
+  const techSpacing = Math.max(200, 600 / Math.max(techniques.length, 1));
+  const mitSpacing = Math.max(200, 700 / Math.max(mitigations.length, 1));
+  const techStartX = 300 - ((techniques.length - 1) * techSpacing) / 2;
+  const mitStartX = 300 - ((mitigations.length - 1) * mitSpacing) / 2;
+
+  // Technique nodes
+  techniques.forEach((t, i) => {
+    const nodeId = `tech-${i}`;
+    nodes.push({
+      id: nodeId,
+      type: 'default',
+      position: { x: techStartX + i * techSpacing, y: 140 },
+      data: { label: `${t.technique_id}\n${t.technique_name}` },
+      style: {
+        background: '#1e1b4b',
+        border: '1.5px solid #6366f1',
+        color: '#a5b4fc',
+        borderRadius: 8,
+        fontSize: 9,
+        fontWeight: 'bold',
+        padding: '6px 10px',
+        minWidth: 140,
+        textAlign: 'center',
+        whiteSpace: 'pre-line',
+      },
+    });
+    edges.push({
+      id: `e-event-${nodeId}`,
+      source: 'event',
+      target: nodeId,
+      style: { stroke: '#6366f1', strokeWidth: 1.5 },
+      animated: true,
+    });
+  });
+
+  // Mitigation nodes
+  mitigations.forEach((m, i) => {
+    const nodeId = `mit-${i}`;
+    nodes.push({
+      id: nodeId,
+      type: 'default',
+      position: { x: mitStartX + i * mitSpacing, y: 290 },
+      data: { label: `${m.mitigation_name}` },
+      style: {
+        background: '#052e16',
+        border: '1.5px solid #22c55e',
+        color: '#86efac',
+        borderRadius: 8,
+        fontSize: 9,
+        fontWeight: 'bold',
+        padding: '6px 10px',
+        minWidth: 130,
+        textAlign: 'center',
+      },
+    });
+
+    // Connect each mitigation to relevant techniques (or directly to event if no techniques)
+    if (techniques.length > 0) {
+      techniques.forEach((_, ti) => {
+        edges.push({
+          id: `e-tech${ti}-${nodeId}`,
+          source: `tech-${ti}`,
+          target: nodeId,
+          style: { stroke: '#22c55e', strokeWidth: 1, strokeDasharray: '4 2' },
+        });
+      });
+    } else {
+      edges.push({
+        id: `e-event-${nodeId}`,
+        source: 'event',
+        target: nodeId,
+        style: { stroke: '#22c55e', strokeWidth: 1, strokeDasharray: '4 2' },
+      });
+    }
+  });
+
+  return { nodes, edges };
+}
+
 const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
     <div
     onClick={onClick}
@@ -41,6 +161,13 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [agentTickets, setAgentTickets] = useState([]);
 
+  // Rebuild flow graph whenever the selected risk item changes
+  useEffect(() => {
+    const { nodes: newNodes, edges: newEdges } = buildMitreFlowGraph(latestRisk);
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [latestRisk]);
+
   useEffect(() => {
     const source = new EventSource('http://localhost:8000/api/v1/dashboard/stream');
     
@@ -55,8 +182,9 @@ export default function App() {
           setLiveLogs(prev => [data, ...prev].slice(0, 20));
           setIsProcessing(true);
         } else if (type === 'risk_score') {
-          setRiskScores(prev => [data, ...prev].slice(0, 15));
-          setLatestRisk(data);
+          const enriched = { ...data, _id: crypto.randomUUID() };
+          setRiskScores(prev => [enriched, ...prev].slice(0, 15));
+          setLatestRisk(enriched);
         } else if (type === 'attack_chain') {
           setAttackChains(prev => [data, ...prev].slice(0, 5));
         } else if (type === 'agent_pr' || type === 'agent_ticket') {
