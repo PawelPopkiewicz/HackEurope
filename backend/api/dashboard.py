@@ -8,14 +8,36 @@ import json
 import asyncio
 from datetime import datetime, timezone
 from typing import AsyncGenerator, Union, List, Dict, Any
-from fastapi import APIRouter, Request, Body
+from fastapi import APIRouter, Request, Body, HTTPException, Security
 from fastapi.responses import StreamingResponse
+from fastapi.security import APIKeyHeader
 
 from backend.api.bus import dashboard_bus
+from backend.config import settings
 from backend.constants import SSE_MEDIA_TYPE
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
+
+_api_key_header = APIKeyHeader(name="X-Internal-Token", auto_error=False)
+
+
+def _verify_internal_token(token: str | None) -> None:
+    """Raise HTTP 401 if the token is required but missing or wrong.
+
+    In production (API_DEBUG=False) the token is always required.
+    In debug mode, when the token is not configured, requests are allowed
+    through with a startup warning so local development stays frictionless.
+    """
+    if settings.INTERNAL_API_TOKEN:
+        if token != settings.INTERNAL_API_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing internal API token")
+    elif not settings.API_DEBUG:
+        # Non-debug with no token configured is a misconfiguration — reject all.
+        raise HTTPException(
+            status_code=503,
+            detail="Internal API token is not configured; endpoint unavailable in production",
+        )
 
 
 def _now() -> str:
@@ -26,7 +48,10 @@ def _now() -> str:
 # ── Endpoint: Push Data ────────────────────────────────────────────────────────
 
 @router.post("/send_honeypot_json")
-async def send_honeypot_json(data: Union[Dict[str, Any], List[Dict[str, Any]]] = Body(...)) -> Dict[str, Any]:
+async def send_honeypot_json(
+    data: Union[Dict[str, Any], List[Dict[str, Any]]] = Body(...),
+    token: str | None = Security(_api_key_header),
+) -> Dict[str, Any]:
     """
     Receive and broadcast honeypot logs to all connected dashboard clients.
     Triggers background MITRE classification.
@@ -37,6 +62,7 @@ async def send_honeypot_json(data: Union[Dict[str, Any], List[Dict[str, Any]]] =
     Returns:
         Status information about the broadcast
     """
+    _verify_internal_token(token)
     subs = len(dashboard_bus.subscribers)
     
     if not isinstance(data, list):

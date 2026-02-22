@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from backend.logger import setup_logging
 from backend.config import settings
@@ -19,16 +20,27 @@ settings.log_config()
 app = FastAPI(
     title=API_TITLE,
     description=API_DESCRIPTION,
-    version=API_VERSION
+    version=API_VERSION,
+    # Disable the interactive docs in production to reduce attack surface
+    docs_url="/docs" if settings.API_DEBUG else None,
+    redoc_url="/redoc" if settings.API_DEBUG else None,
 )
 
-# Enable CORS
+# Restrict accepted Host headers to prevent Host-header injection
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1", "*.localhost", settings.API_HOST]
+    if settings.API_DEBUG
+    else ["localhost", "127.0.0.1", settings.API_HOST],
+)
+
+# Enable CORS with explicit allow-list (never wildcard in production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Include modular API routers

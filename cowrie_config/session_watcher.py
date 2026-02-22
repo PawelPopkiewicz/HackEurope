@@ -1,10 +1,18 @@
 import json
+import os
 import time
 import requests
 from collections import defaultdict
 
-LOG_FILE = "/home/letv1n/comsci/Projects/HackEurope/cowrie_config/cowrie/var/log/cowrie/cowrie.json"
-API_URL = "http://localhost:8000/api/v1/dashboard/send_honeypot_json"
+LOG_FILE = os.getenv(
+    "COWRIE_LOG_FILE",
+    "/var/log/cowrie/cowrie.json",
+)
+API_URL = os.getenv(
+    "DASHBOARD_API_URL",
+    "http://localhost:8000/api/v1/dashboard/send_honeypot_json",
+)
+INTERNAL_API_TOKEN = os.getenv("INTERNAL_API_TOKEN", "")
 
 # store logs grouped by session
 sessions = defaultdict(list)
@@ -46,7 +54,10 @@ with open(LOG_FILE, "r") as f:
             }
 
             try:
-                requests.post(API_URL, json=payload, timeout=5)
+                headers = {}
+                if INTERNAL_API_TOKEN:
+                    headers["X-Internal-Token"] = INTERNAL_API_TOKEN
+                requests.post(API_URL, json=payload, headers=headers, timeout=5)
                 print(f"POST sent ({len(payload['logs'])} events)")
             except Exception as e:
                 print("POST failed:", e)

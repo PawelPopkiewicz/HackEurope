@@ -5,11 +5,15 @@ services:
     build: .
     container_name: antigravity-backend
     ports:
-      - "8000:8000"
+      # Bind only to localhost — do not expose the management API to external interfaces
+      - "127.0.0.1:8000:8000"
     volumes:
       - .:/app
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - INTERNAL_API_TOKEN=${INTERNAL_API_TOKEN}
+      - API_DEBUG=${API_DEBUG:-False}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
     networks:
       - antigravity-net
 
@@ -21,6 +25,11 @@ services:
       - "2223:2223"
     volumes:
       - ./cowrie-log:/cowrie/var/log/cowrie
+    environment:
+      # Limit the number of authentication attempts per connection (M1028 / M1016)
+      - COWRIE_SSH_AUTH_ATTEMPTS=${COWRIE_SSH_AUTH_ATTEMPTS:-3}
+      # Disconnect idle sessions after COWRIE_SESSION_TIMEOUT seconds (M1028)
+      - COWRIE_SESSION_TIMEOUT=${COWRIE_SESSION_TIMEOUT:-300}
     networks:
       - antigravity-net
 
