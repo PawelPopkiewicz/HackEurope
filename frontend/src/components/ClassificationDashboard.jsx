@@ -68,6 +68,43 @@ const RiskItem = ({ data }) => (
         {data.summary}
       </div>
     )}
+    {data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="flex flex-col gap-2">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">MITRE ATT&amp;CK</div>
+        {data.mitre_attack.map((attack) => (
+          <div key={`${attack.tactic_id}-${attack.technique_id}`} className="p-2 bg-black/30 rounded border border-zinc-800/60">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="px-1.5 py-0.5 bg-blue-900/40 border border-blue-800/50 rounded text-[9px] font-black text-blue-400 uppercase">{attack.tactic_id}</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase">{attack.tactic_name}</span>
+              <ChevronRight size={10} className="text-zinc-700" />
+              <span className="px-1.5 py-0.5 bg-purple-900/40 border border-purple-800/50 rounded text-[9px] font-black text-purple-400 uppercase">{attack.technique_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold">{attack.technique_name}</span>
+            </div>
+            {attack.evidence && attack.evidence.length > 0 && (
+              <div className="mt-1 flex flex-col gap-0.5">
+                {attack.evidence.map((ev, eidx) => (
+                  <div key={eidx} className="text-[9px] text-zinc-500 font-mono pl-2 border-l border-zinc-800 break-words">{ev}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+    {data?.mitigations && data.mitigations.length > 0 && (
+      <div className="flex flex-col gap-2">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Mitigations</div>
+        {data.mitigations.map((m) => (
+          <div key={m.mitigation_id} className="p-2 bg-black/30 rounded border border-zinc-800/60">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-1.5 py-0.5 bg-emerald-900/40 border border-emerald-800/50 rounded text-[9px] font-black text-emerald-400 uppercase">{m.mitigation_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold">{m.mitigation_name}</span>
+            </div>
+            <div className="text-[9px] text-zinc-500 leading-relaxed">{m.description}</div>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 
