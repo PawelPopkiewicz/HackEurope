@@ -3,8 +3,9 @@
  * Entry point with routing and layout
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Terminal } from 'lucide-react';
+import { useNodesState, useEdgesState } from '@xyflow/react';
 import './App.css';
 
 import Sidebar from './components/Sidebar';
@@ -32,10 +33,23 @@ const NavigationItem = ({ icon: Icon, label, active, onClick }) => (
   </div>
 );
 
+const initialNodes = [
+  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Detect' } },
+  { id: '2', position: { x: 150, y: 0 }, data: { label: 'Classify' } },
+  { id: '3', position: { x: 300, y: 0 }, data: { label: 'Analyze' } },
+  { id: '4', position: { x: 450, y: 0 }, data: { label: 'Mitigate' } },
+];
+
+const initialEdges = [
+  { id: 'e1-2', source: '1', target: '2' },
+  { id: 'e2-3', source: '2', target: '3' },
+  { id: 'e3-4', source: '3', target: '4' },
+];
+
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeView, setActiveView] = useState('home');
   const [status, setStatus] = useState('Connecting...');
 
   // Lifted Dashboard State
@@ -100,10 +114,6 @@ export default function App() {
         return <Settings />;
       case 'home':
         return <Home />;
-      case 'classification':
-        return <ClassificationDashboard />;
-      case 'honeypot':
-        return <HoneypotConfig />;
 
       case 'classification':
         return (
@@ -135,6 +145,8 @@ export default function App() {
             agentPRs={agentPRs}
           />
         );
+      case 'honeypot':
+        return <HoneypotConfig />;
       default:
         return <Dashboard />;
     }

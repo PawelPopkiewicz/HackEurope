@@ -91,8 +91,8 @@ async def send_honeypot_json(data: Union[Dict[str, Any], List[Dict[str, Any]]] =
                 if pr_event:
                     pr_event["id"] = 100 + len(log_data)
                     pr_event["timestamp"] = _now()
-                    if logs and isinstance(logs, list) and len(logs) > 0:
-                        pr_event["src_ip"] = logs[0].get("src_ip")
+                    if log_data and isinstance(log_data, list) and len(log_data) > 0:
+                        pr_event["src_ip"] = log_data[0].get("src_ip")
                     
                     await dashboard_bus.emit(pr_event)
                     logger.info(f"AI-generated Agent PR emitted: {pr_event.get('title')}")
