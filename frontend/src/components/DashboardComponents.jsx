@@ -56,7 +56,7 @@ export const RiskItem = ({ data, active, onClick }) => (
       <div className="relative w-10 h-10 flex-shrink-0">
         <div className={`absolute inset-0 rounded-full border-2 border-zinc-800`} />
         <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">
-          {data?.score || 50}
+          {data?.risk_score ?? data?.score ?? 50}
         </div>
       </div>
       <div className="flex-grow min-w-0">
