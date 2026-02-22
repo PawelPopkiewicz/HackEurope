@@ -44,7 +44,8 @@ Each item in the 'items' array must correspond to one of the input logs.
           "mitigation_name": string,
           "description": string
         }
-      ]
+      ],
+      "fix_suggestion": "string (optional - concrete remediation steps for the copilot agent; omit for LOW severity with no MITRE techniques)"
     }
   ]
 }

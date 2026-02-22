@@ -142,6 +142,18 @@ export const MitigationItem = ({ data }) => (
   </div>
 );
 
+export const FixSuggestionItem = ({ suggestion }) => (
+  <div className="p-3 bg-indigo-900/10 border border-indigo-800/30 rounded-lg">
+    <div className="flex items-center gap-2 mb-2">
+      <div className="p-1 rounded bg-indigo-700/10 text-indigo-400">
+        <Zap size={14} />
+      </div>
+      <span className="text-[10px] font-black text-indigo-300 uppercase">Fix Suggestion</span>
+    </div>
+    <p className="text-[10px] text-zinc-300 leading-relaxed">{suggestion}</p>
+  </div>
+);
+
 export const AgentTicketItem = ({ data }) => (
   <div className="mb-3 p-3 bg-zinc-900/20 border border-zinc-800 rounded-lg flex items-center justify-between">
     <div className="flex items-center gap-3">
