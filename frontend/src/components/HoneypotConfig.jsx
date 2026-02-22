@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Github, Link, ArrowRight, ShieldCheck, Server, Code, ShieldAlert, Cpu, Share2, Globe, Activity, ChevronDown } from 'lucide-react';
 
+/** Collapsible configuration section with an icon header and animated reveal. */
 const ConfigSection = ({ icon: Icon, title, children, defaultOpen = true }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -31,6 +32,7 @@ const ConfigSection = ({ icon: Icon, title, children, defaultOpen = true }) => {
   );
 };
 
+/** Labelled text input field for honeypot configuration forms. */
 const FormField = ({ label, id, placeholder, type = "text", value, onChange, required = false }) => (
   <div className="space-y-1.5">
     <label htmlFor={id} className="text-[13px] font-medium text-zinc-400 ml-0.5">
@@ -48,6 +50,7 @@ const FormField = ({ label, id, placeholder, type = "text", value, onChange, req
   </div>
 );
 
+/** Custom styled dropdown selector with click-away dismiss behaviour. */
 const DropdownField = ({ label, id, options, value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find(opt => opt.value === value) || options[0];
@@ -91,6 +94,13 @@ const DropdownField = ({ label, id, options, value, onChange }) => {
   );
 };
 
+/**
+ * Multi-section form for configuring a Cowrie honeypot deployment.
+ *
+ * Collects infrastructure, application, security, and traffic settings, then
+ * simulates an environment launch.  After successful submission the user sees
+ * a deployment confirmation screen.
+ */
 export default function HoneypotConfig() {
   const [formData, setFormData] = useState({
     repoUrl: '',

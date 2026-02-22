@@ -1,3 +1,5 @@
+"""Utility for programmatically creating GitHub issues assigned to the Copilot SWE agent."""
+
 import json
 import subprocess
 
@@ -14,6 +16,25 @@ def create_github_issue(
     custom_agent: str = "",
     model: str = "",
 ):
+    """Create a GitHub issue via the ``gh`` CLI and assign it to an agent.
+
+    Args:
+        owner: GitHub repository owner (user or organisation).
+        repo: Repository name.
+        title: Issue title.
+        body: Issue body / description.
+        assignees: GitHub usernames to assign. Defaults to the Copilot SWE agent.
+        base_branch: Branch that the agent should target.
+        custom_instructions: Optional extra instructions for the agent.
+        custom_agent: Optional custom agent identifier.
+        model: Optional LLM model override.
+
+    Returns:
+        dict: The parsed JSON response from the GitHub API.
+
+    Raises:
+        RuntimeError: If the ``gh api`` command exits with a non-zero status.
+    """
     payload = {
         "title": title,
         "body": body,

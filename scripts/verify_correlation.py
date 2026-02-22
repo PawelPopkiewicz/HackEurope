@@ -1,8 +1,11 @@
+"""Send a sample multi-step attack sequence to the dashboard endpoint for testing."""
+
 import httpx
 import asyncio
 import json
 
 async def send_attack_sequence():
+    """POST a realistic brute-force → login → command execution log sequence to the API."""
     url = "http://localhost:8000/api/v1/dashboard/send_honeypot_json"
     
     sequence = [

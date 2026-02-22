@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from llm.api_call import get_llm_response
 
 def test_gemini_api():
+    """Smoke-test the Gemini API connection by sending a simple prompt."""
     print("Testing Gemini API connection...")
     try:
         response = get_llm_response("Hello! How is your day today.")

@@ -1,3 +1,10 @@
+"""Prompt templates and JSON schemas for the Gemini-based MITRE ATT&CK classifier.
+
+This module defines the system prompts and expected output schemas used
+when calling the LLM for individual log classification and multi-stage
+attack correlation.
+"""
+
 SYSTEM_PROMPT = (
     "You are a MITRE ATT&CK classifier.\n"
     "Your task is to analyze security logs and map attacker behavior "

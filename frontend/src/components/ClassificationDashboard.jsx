@@ -11,6 +11,10 @@ import {
   Cpu
 } from 'lucide-react';
 
+/**
+ * Reusable dashboard panel with a coloured icon header and scrollable content area.
+ * @param {{ title: string, icon: React.ElementType, children: React.ReactNode, color: string, glowColor: string }} props
+ */
 const Panel = ({ title, icon: Icon, children, color, glowColor }) => (
   <div className={`bg-zinc-950 border border-zinc-900 rounded-xl flex flex-col h-full shadow-lg overflow-hidden group/panel`}>
     <div className="px-5 py-4 border-b border-zinc-900 flex justify-between items-center bg-zinc-900/20">
@@ -28,6 +32,7 @@ const Panel = ({ title, icon: Icon, children, color, glowColor }) => (
   </div>
 );
 
+/** Renders a single honeypot log entry with timestamp, event ID, message, and optional source IP. */
 const LogItem = ({ data }) => (
   <div className="mb-2 p-3 font-mono text-[11px] bg-black/40 rounded border border-zinc-800/50 hover:border-zinc-700 hover:bg-zinc-900/40 transition-all duration-200 group/item">
     <div className="flex justify-between mb-1">
@@ -44,6 +49,7 @@ const LogItem = ({ data }) => (
   </div>
 );
 
+/** Displays a MITRE ATT&CK risk score card with severity, score, and analysis summary. */
 const RiskItem = ({ data }) => (
   <div className="mb-3 p-3 bg-zinc-900/20 rounded-lg flex flex-col gap-3 border border-zinc-900 group hover:bg-zinc-800/20 transition-all duration-300">
     <div className="flex items-center gap-4">
@@ -71,6 +77,7 @@ const RiskItem = ({ data }) => (
   </div>
 );
 
+/** Visualises a correlated multi-stage attack chain as a vertical timeline. */
 const AttackChainItem = ({ data }) => (
   <div className="mb-4 bg-zinc-950/40 border border-zinc-900 rounded-xl overflow-hidden group/chain hover:border-zinc-700 transition-all duration-300">
     <div className="p-3 border-b border-zinc-900 flex justify-between items-center bg-zinc-900/20">
@@ -96,6 +103,12 @@ const AttackChainItem = ({ data }) => (
   </div>
 );
 
+/**
+ * Real-time classification dashboard that subscribes to the backend SSE stream.
+ *
+ * Incoming events are sorted into three panels: live honeypot logs,
+ * individual risk-score diagnostics, and correlated attack chains.
+ */
 export default function ClassificationDashboard() {
   const [liveLogs, setLiveLogs] = useState([]);
   const [riskScores, setRiskScores] = useState([]);

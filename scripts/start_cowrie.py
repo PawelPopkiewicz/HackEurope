@@ -1,3 +1,5 @@
+"""Script to start the Cowrie honeypot and its session watcher."""
+
 import subprocess as sp
 
 cowrie_pr = sp.run(["cowrie", "start"], check=True)

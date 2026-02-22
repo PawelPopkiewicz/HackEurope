@@ -15,6 +15,10 @@ import ClassificationDashboard from './components/ClassificationDashboard';
 const initialNodes = [];
 const initialEdges = [];
 
+/**
+ * Sidebar navigation item that highlights when the corresponding tab is active.
+ * @param {{ icon: React.ElementType, label: string, active: boolean, onClick: () => void }} props
+ */
 const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
     <div
     onClick={onClick}
@@ -26,6 +30,12 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
   </div>
 );
 
+/**
+ * Root application component.
+ *
+ * Renders the sidebar navigation and switches between the Home, Honeypot
+ * Config, Classification Agent, and Fixer Agent views based on the active tab.
+ */
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -63,6 +73,7 @@ export default function App() {
   }, [setNodes]);
   */
 
+  /** Return the content component corresponding to the currently selected sidebar tab. */
   const renderContent = () => {
     switch (activeTab) {
       case 'home':

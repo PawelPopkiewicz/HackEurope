@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 def _now() -> str:
+    """Return the current UTC time as an ``HH:MM:SS`` string for event timestamps."""
     return datetime.now(tz=timezone.utc).strftime("%H:%M:%S")
 
 # ── Endpoint: Push Data ────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ async def send_honeypot_json(data: Union[dict, list] = Body(...)):
 
     # 2. Background Classification
     async def run_and_emit_classification(log_data):
+        """Run MITRE classification and correlation in the background, then emit results."""
         logger.info(f"Background classification task started for {len(log_data)} logs.")
         try:
             # results is now a List[dict]
