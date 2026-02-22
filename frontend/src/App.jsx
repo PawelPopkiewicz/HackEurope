@@ -30,7 +30,7 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [activeTab, setActiveTab] = useState('home');
-  const [status, setStatus] = useState('Connecting...');
+  const [status, setStatus] = useState('Online');
 
   /* 
   useEffect(() => {
@@ -159,7 +159,7 @@ export default function App() {
             Current View: <strong className="text-white capitalize">{activeTab.replace('_', ' ')}</strong>
           </span>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${status === 'Connected' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+            <div className={`w-2 h-2 rounded-full ${status === 'Online' || status === 'Connected' ? 'bg-emerald-500' : 'bg-red-500'}`} />
             <span className="text-xs text-zinc-400">{status}</span>
           </div>
         </header>
