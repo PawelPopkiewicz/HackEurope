@@ -75,7 +75,7 @@ async def send_honeypot_json(data: Union[Dict[str, Any], List[Dict[str, Any]]] =
                             "In the following data, the MITRE classifier identified the following techniques and provided fix suggestions for each log entry:\n"
                             + json.dumps(results, indent=2)
                         )
-                        create_github_issue("MITRE Classification Results", results_with_context)
+                        create_github_issue("MITRE Classification Results", results_with_context, labels=["honeypot"])
                     except Exception:
                         logger.exception("Failed to create github issue from classification results.")
             else:
