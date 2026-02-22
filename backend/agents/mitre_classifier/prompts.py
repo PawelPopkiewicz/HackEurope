@@ -44,7 +44,8 @@ Each item in the 'items' array must correspond to one of the input logs.
           "mitigation_name": string,
           "description": string
         }
-      ]
+      ],
+      "fix_suggestion": "string (concrete, actionable remediation steps for the Copilot agent to implement)"
     }
   ]
 }

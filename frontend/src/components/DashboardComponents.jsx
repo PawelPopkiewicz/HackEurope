@@ -10,7 +10,8 @@ import {
   Database,
   Cpu,
   ShieldCheck,
-  Layers as LayersIcon
+  Layers as LayersIcon,
+  Lightbulb
 } from 'lucide-react';
 
 export const Panel = ({ title, icon: Icon, children, color, glowColor }) => (
@@ -156,5 +157,17 @@ export const AgentTicketItem = ({ data }) => (
     <div className="px-2 py-1 bg-zinc-800 rounded text-[9px] font-bold text-zinc-400 uppercase">
       {data.label || data.priority}
     </div>
+  </div>
+);
+
+export const FixSuggestionItem = ({ suggestion }) => (
+  <div className="p-3 bg-amber-900/5 border border-amber-900/20 rounded-lg hover:bg-amber-900/10 transition-colors">
+    <div className="flex items-center gap-3 mb-2">
+      <div className="p-1 rounded bg-amber-700/10 text-amber-400">
+        <Lightbulb size={14} />
+      </div>
+      <span className="text-[10px] font-black text-amber-300 uppercase">Fix Suggestion</span>
+    </div>
+    <p className="text-[10px] text-zinc-300 leading-relaxed">{suggestion}</p>
   </div>
 );
