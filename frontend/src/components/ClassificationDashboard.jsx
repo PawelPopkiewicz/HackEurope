@@ -4,9 +4,11 @@ import {
   Database,
   Cpu,
   AlertTriangle,
-  TrendingUp
+  TrendingUp,
+  Layers,
+  ShieldCheck
 } from 'lucide-react';
-import { Panel, LogItem, RiskItem, AttackChainItem } from './DashboardComponents';
+import { Panel, LogItem, RiskItem, AttackChainItem, MitreItem, MitigationItem } from './DashboardComponents';
 
 export default function ClassificationDashboard({ 
   liveLogs, 
@@ -77,6 +79,22 @@ export default function ClassificationDashboard({
         </div>
 
       </div>
+
+      {/* MITRE DETAIL PANEL: shown when a risk item is selected */}
+      {latestRisk && (latestRisk.mitre_attack?.length > 0 || latestRisk.mitigations?.length > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 pb-6 flex-shrink-0 animate-in fade-in duration-500 slide-in-from-bottom-2">
+          <div className="min-h-[200px]">
+            <Panel title="MITRE ATT&CK Techniques" icon={Layers} color="bg-blue-400" glowColor="bg-blue-300">
+              {latestRisk.mitre_attack?.map((m, i) => <MitreItem key={i} data={m} />)}
+            </Panel>
+          </div>
+          <div className="min-h-[200px]">
+            <Panel title="Recommended Mitigations" icon={ShieldCheck} color="bg-emerald-400" glowColor="bg-emerald-300">
+              {latestRisk.mitigations?.map((m, i) => <MitigationItem key={i} data={m} />)}
+            </Panel>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
