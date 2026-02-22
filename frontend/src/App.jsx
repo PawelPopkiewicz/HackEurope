@@ -55,8 +55,9 @@ export default function App() {
           setLiveLogs(prev => [data, ...prev].slice(0, 20));
           setIsProcessing(true);
         } else if (type === 'risk_score') {
-          setRiskScores(prev => [data, ...prev].slice(0, 15));
-          setLatestRisk(data);
+          const scored = { ...data, _uid: crypto.randomUUID() };
+          setRiskScores(prev => [scored, ...prev].slice(0, 15));
+          setLatestRisk(scored);
         } else if (type === 'attack_chain') {
           setAttackChains(prev => [data, ...prev].slice(0, 5));
         } else if (type === 'agent_pr' || type === 'agent_ticket') {

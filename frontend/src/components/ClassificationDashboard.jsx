@@ -3,10 +3,10 @@ import {
   Activity, 
   Database,
   Cpu,
-  AlertTriangle,
-  TrendingUp
+  Layers,
+  ShieldCheck
 } from 'lucide-react';
-import { Panel, LogItem, RiskItem, AttackChainItem } from './DashboardComponents';
+import { Panel, LogItem, RiskItem, AttackChainItem, MitreItem, MitigationItem } from './DashboardComponents';
 
 export default function ClassificationDashboard({ 
   liveLogs, 
@@ -28,7 +28,7 @@ export default function ClassificationDashboard({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow p-6 h-full overflow-auto animate-in fade-in duration-1000 slide-in-from-bottom-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow p-6 h-full overflow-auto animate-in fade-in duration-1000 slide-in-from-bottom-2">
         
         {/* COLUMN 1: LIVE FEED */}
         <div className="flex flex-col gap-6 h-full">
@@ -54,9 +54,9 @@ export default function ClassificationDashboard({
               ) : (
                 riskScores.map((score, i) => (
                   <RiskItem 
-                    key={i} 
+                    key={score._uid || i} 
                     data={score} 
-                    active={latestRisk?.timestamp === score.timestamp}
+                    active={latestRisk?._uid === score._uid}
                     onClick={() => setLatestRisk(score)}
                   />
                 ))
@@ -71,6 +71,32 @@ export default function ClassificationDashboard({
                 </div>
               ) : (
                 attackChains.map((chain, i) => <AttackChainItem key={i} data={chain} />)
+              )}
+            </Panel>
+          </div>
+        </div>
+
+        {/* COLUMN 3: MITRE DETAILS for selected risk */}
+        <div className="flex flex-col gap-6 h-full">
+          <div className="h-1/2 min-h-[300px]">
+            <Panel title="MITRE ATT&CK" icon={Layers} color="bg-blue-400" glowColor="bg-blue-300">
+              {!latestRisk?.mitre_attack ? (
+                <div className="flex flex-col items-center justify-center h-full text-zinc-600 uppercase font-bold text-[9px] text-center px-8">
+                  Select a diagnostic entry to view MITRE details
+                </div>
+              ) : (
+                latestRisk.mitre_attack.map((m, i) => <MitreItem key={i} data={m} />)
+              )}
+            </Panel>
+          </div>
+          <div className="h-1/2 min-h-[300px]">
+            <Panel title="Mitigations" icon={ShieldCheck} color="bg-emerald-400" glowColor="bg-emerald-300">
+              {!latestRisk?.mitigations ? (
+                <div className="flex flex-col items-center justify-center h-full text-zinc-600 uppercase font-bold text-[9px] text-center px-8">
+                  Actionable mitigations will appear here
+                </div>
+              ) : (
+                latestRisk.mitigations.map((m, i) => <MitigationItem key={i} data={m} />)
               )}
             </Panel>
           </div>
