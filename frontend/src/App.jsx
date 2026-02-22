@@ -73,7 +73,7 @@ export default function App() {
   }, [setNodes]);
   */
 
-  /** Return the content component corresponding to the currently selected sidebar tab. */
+  // Return the content component corresponding to the currently selected sidebar tab.
   const renderContent = () => {
     switch (activeTab) {
       case 'home':

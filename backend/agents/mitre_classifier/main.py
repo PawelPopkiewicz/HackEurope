@@ -99,7 +99,7 @@ async def logs_normalization(logs: Any) -> Any:
 def clean_llm_json(text: str) -> str:
     """Strip markdown code-block wrappers and surrounding whitespace from LLM output.
 
-    LLMs sometimes wrap JSON output in ````json ... ``` `` markers; this
+    LLMs sometimes wrap JSON output in ``json ... `` markers; this
     helper removes those so the result can be parsed with ``json.loads``.
 
     Args:
