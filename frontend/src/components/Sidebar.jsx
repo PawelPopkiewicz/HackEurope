@@ -123,38 +123,3 @@ export default function Sidebar({ activeView, onViewChange }) {
     </aside>
   );
 }
-                <li key={item.path} className="sidebar__menu-item">
-                  <NavLink
-                    to={item.path}
-                    end={item.path === '/'}
-                    className={({ isActive }) =>
-                      `sidebar__link ${isActive ? 'active' : ''}`
-                    }
-                  >
-                    <span className="sidebar__icon">{item.icon}</span>
-                    <span>{item.name}</span>
-                    {item.badge && (
-                      <span className="sidebar__badge">{item.badge}</span>
-                    )}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </nav>
-
-      <div className="sidebar__footer">
-        <div className="sidebar__user">
-          <div className="sidebar__avatar">U</div>
-          <div className="sidebar__user-info">
-            <div className="sidebar__user-name">User</div>
-            <div className="sidebar__user-email">user@hackeurope.dev</div>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
-};
-
-export default Sidebar;
