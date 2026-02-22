@@ -68,6 +68,41 @@ const RiskItem = ({ data }) => (
         {data.summary}
       </div>
     )}
+    {data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">MITRE ATT&amp;CK</span>
+        {data.mitre_attack.map((attack) => (
+          <div key={`${attack.tactic_id}-${attack.technique_id}`} className="bg-black/30 rounded p-2 border border-zinc-800/50">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded">{attack.technique_id}</span>
+              <span className="text-[9px] font-bold text-zinc-300 truncate">{attack.technique_name}</span>
+            </div>
+            <div className="text-[9px] text-zinc-500 italic">{attack.tactic_name} ({attack.tactic_id})</div>
+            {attack.evidence && attack.evidence.length > 0 && (
+              <ul className="mt-1 space-y-0.5">
+                {attack.evidence.map((ev, eidx) => (
+                  <li key={`${attack.technique_id}-${eidx}`} className="text-[9px] text-zinc-600 font-mono before:content-['›'] before:mr-1 before:text-zinc-700">{ev}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+    {data?.mitigations && data.mitigations.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Mitigations</span>
+        {data.mitigations.map((mit) => (
+          <div key={mit.mitigation_id} className="bg-black/20 rounded p-2 border border-zinc-800/50">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded">{mit.mitigation_id}</span>
+              <span className="text-[9px] font-bold text-zinc-300 truncate">{mit.mitigation_name}</span>
+            </div>
+            <div className="text-[9px] text-zinc-500 leading-relaxed">{mit.description}</div>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 
