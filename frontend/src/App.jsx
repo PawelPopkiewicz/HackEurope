@@ -30,7 +30,7 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [activeTab, setActiveTab] = useState('home');
-  const [status, setStatus] = useState('Connecting...');
+  const [status, setStatus] = useState('Offline');
 
   /* 
   useEffect(() => {
