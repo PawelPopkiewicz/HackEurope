@@ -7,8 +7,9 @@ import {
   Layers, 
   Search,
   Database,
+  Lightbulb,
 } from 'lucide-react';
-import { Panel, MitreItem, MitigationItem, AgentTicketItem } from './DashboardComponents';
+import { Panel, MitreItem, MitigationItem, AgentTicketItem, FixSuggestionItem } from './DashboardComponents';
 
 export default function FixerDashboard({ 
   nodes, 
@@ -45,7 +46,7 @@ export default function FixerDashboard({
 
         {/* COLUMN 2: MITRE & MITIGATIONS (Stacked) */}
         <div className="flex flex-col gap-6 h-full">
-          <div className="h-1/3 min-h-[200px]">
+          <div className="h-1/4 min-h-[160px]">
             <Panel title="MITRE ATT&CK Tracking" icon={Layers} color="bg-blue-400" glowColor="bg-blue-300">
               {!latestRisk?.mitre_attack ? (
                 <div className="flex flex-col items-center justify-center h-full text-zinc-600 uppercase font-bold text-[9px] text-center px-8">
@@ -57,7 +58,7 @@ export default function FixerDashboard({
             </Panel>
           </div>
           
-          <div className="h-1/3 min-h-[200px]">
+          <div className="h-1/4 min-h-[160px]">
             <Panel title="Mitigations" icon={Search} color="bg-emerald-400" glowColor="bg-emerald-300">
               {!latestRisk?.mitigations ? (
                 <div className="flex flex-col items-center justify-center h-full text-zinc-600 uppercase font-bold text-[9px] text-center px-8">
@@ -69,7 +70,19 @@ export default function FixerDashboard({
             </Panel>
           </div>
 
-          <div className="h-1/3 min-h-[200px]">
+          <div className="h-1/4 min-h-[160px]">
+            <Panel title="Fix Suggestion" icon={Lightbulb} color="bg-amber-400" glowColor="bg-amber-300">
+              {!latestRisk?.fix_suggestion ? (
+                <div className="flex flex-col items-center justify-center h-full text-zinc-600 uppercase font-bold text-[9px] text-center px-8">
+                  Fix suggestions will appear here
+                </div>
+              ) : (
+                <FixSuggestionItem suggestion={latestRisk.fix_suggestion} />
+              )}
+            </Panel>
+          </div>
+
+          <div className="h-1/4 min-h-[160px]">
             <Panel title="Agent Tickets" icon={Zap} color="bg-indigo-600" glowColor="bg-indigo-500">
               {(!agentTickets || agentTickets.length === 0) ? (
                 <div className="flex flex-col items-center justify-center h-full text-zinc-500 uppercase font-black text-[10px]">

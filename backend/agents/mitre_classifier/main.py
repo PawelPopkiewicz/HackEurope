@@ -1,4 +1,5 @@
 import asyncio
+import html
 import json
 import os
 import re
@@ -125,6 +126,22 @@ def clean_llm_json(text: str) -> str:
 # LLM Classification
 # -------------------------
 
+def _unescape_html_in_obj(obj: Any) -> None:
+    """Recursively unescape HTML entities in all string values of a dict or list."""
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if isinstance(value, str):
+                obj[key] = html.unescape(value)
+            else:
+                _unescape_html_in_obj(value)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            if isinstance(item, str):
+                obj[i] = html.unescape(item)
+            else:
+                _unescape_html_in_obj(item)
+
+
 async def classify_with_gemini(logs: List[dict], mitre_data: Any) -> Optional[List[dict]]:
     """Send logs to Gemini for individual MITRE classification."""
     if not client:
@@ -177,7 +194,10 @@ async def classify_with_gemini(logs: List[dict], mitre_data: Any) -> Optional[Li
 
         for item in results:
             if not isinstance(item, dict): continue
-            
+
+            # Unescape HTML entities from LLM output (e.g., &amp;&amp; -> &&)
+            _unescape_html_in_obj(item)
+
             # Inject attacker IP
             if attacker_ip:
                 item["attacker_ip"] = attacker_ip
