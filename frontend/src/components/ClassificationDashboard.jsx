@@ -54,9 +54,9 @@ export default function ClassificationDashboard({
               ) : (
                 riskScores.map((score, i) => (
                   <RiskItem 
-                    key={i} 
+                    key={score._id || i} 
                     data={score} 
-                    active={latestRisk?.timestamp === score.timestamp}
+                    active={latestRisk?._id === score._id}
                     onClick={() => setLatestRisk(score)}
                   />
                 ))

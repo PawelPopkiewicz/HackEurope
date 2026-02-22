@@ -74,6 +74,28 @@ export const RiskItem = ({ data, active, onClick }) => (
         {data.summary}
       </div>
     )}
+    {active && data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="space-y-1 pt-1 border-t border-zinc-800">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">MITRE ATT&CK</div>
+        {data.mitre_attack.map((t, i) => (
+          <div key={i} className="flex items-start gap-2 p-1.5 bg-blue-900/10 border border-blue-900/20 rounded">
+            <span className="text-[9px] font-black text-blue-400 shrink-0 bg-blue-500/10 px-1 rounded">{t.technique_id}</span>
+            <span className="text-[9px] text-zinc-300 font-bold uppercase leading-tight">{t.technique_name}</span>
+          </div>
+        ))}
+      </div>
+    )}
+    {active && data?.mitigations && data.mitigations.length > 0 && (
+      <div className="space-y-1 pt-1 border-t border-zinc-800">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Mitigations</div>
+        {data.mitigations.map((m, i) => (
+          <div key={i} className="flex items-start gap-2 p-1.5 bg-emerald-900/10 border border-emerald-900/20 rounded">
+            <ShieldCheck className="text-emerald-500 shrink-0 mt-0.5" size={10} />
+            <span className="text-[9px] text-zinc-300 font-bold uppercase leading-tight">{m.mitigation_name}</span>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 
