@@ -5,6 +5,7 @@ langgraph
 python-dotenv
 pydantic
 google-generativeai
+google-genai
 httpx
 aiofiles
 jinja2
