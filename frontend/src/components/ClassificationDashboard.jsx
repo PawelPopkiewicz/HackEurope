@@ -68,6 +68,42 @@ const RiskItem = ({ data }) => (
         {data.summary}
       </div>
     )}
+    {data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black uppercase text-zinc-500 tracking-wider">MITRE ATT&amp;CK</span>
+        {data.mitre_attack.map((attack) => (
+          <div key={`${attack.tactic_id}-${attack.technique_id}`} className="bg-black/30 border border-zinc-800/60 rounded p-2 flex flex-col gap-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[9px] font-black text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded">{attack.tactic_id}</span>
+              <span className="text-[9px] text-zinc-400 uppercase font-bold">{attack.tactic_name}</span>
+              <span className="text-[9px] font-black text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded ml-auto">{attack.technique_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold">{attack.technique_name}</span>
+            </div>
+            {attack.evidence && attack.evidence.length > 0 && (
+              <div className="flex flex-col gap-0.5 mt-1">
+                {attack.evidence.map((ev, eidx) => (
+                  <span key={`${ev}-${eidx}`} className="text-[9px] text-zinc-500 font-mono truncate">&#x2023; {ev}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+    {data?.mitigations && data.mitigations.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black uppercase text-zinc-500 tracking-wider">MITIGATIONS</span>
+        {data.mitigations.map((m) => (
+          <div key={m.mitigation_id} className="bg-black/20 border border-zinc-800/40 rounded p-2 flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">{m.mitigation_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold truncate">{m.mitigation_name}</span>
+            </div>
+            <span className="text-[9px] text-zinc-500 leading-relaxed">{m.description}</span>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 
