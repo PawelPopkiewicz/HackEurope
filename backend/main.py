@@ -33,6 +33,7 @@ async def root():
         "status": "online",
         "service": "Pen Test Agent Backend",
         "endpoints": [
+            "/api/v1/health",
             "/api/v1/logs/stream",
             "/api/v1/classification/stream",
             "/api/v1/fixing/stream"
