@@ -4,11 +4,14 @@ import {
   Zap, 
   Layers, 
   ChevronRight,
+  ChevronDown,
   Wifi,
   Radio,
   Search,
   Database,
-  Cpu
+  Cpu,
+  Shield,
+  BookOpen
 } from 'lucide-react';
 
 const Panel = ({ title, icon: Icon, children, color, glowColor }) => (
@@ -44,32 +47,107 @@ const LogItem = ({ data }) => (
   </div>
 );
 
-const RiskItem = ({ data }) => (
-  <div className="mb-3 p-3 bg-zinc-900/20 rounded-lg flex flex-col gap-3 border border-zinc-900 group hover:bg-zinc-800/20 transition-all duration-300">
-    <div className="flex items-center gap-4">
-      <div className="relative w-10 h-10 flex-shrink-0">
-        <div className={`absolute inset-0 rounded-full border-2 border-zinc-800`} />
-        <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">
-          {data?.score || 50}
+const RiskItem = ({ data }) => {
+  const [expanded, setExpanded] = useState(false);
+  const hasMitre = data?.mitre_attack && data.mitre_attack.length > 0;
+  const hasMitigations = data?.mitigations && data.mitigations.length > 0;
+  const hasDetails = hasMitre || hasMitigations;
+
+  return (
+    <div className="mb-3 bg-zinc-900/20 rounded-lg flex flex-col border border-zinc-900 hover:border-zinc-700 transition-all duration-300">
+      <div className="p-3 flex flex-col gap-3">
+        <div className="flex items-center gap-4">
+          <div className="relative w-10 h-10 flex-shrink-0">
+            <div className="absolute inset-0 rounded-full border-2" style={{ borderColor: data?.colour || '#f59e0b' }} />
+            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">
+              {data?.score ?? 50}
+            </div>
+          </div>
+          <div className="flex-grow min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-black uppercase" style={{ color: data?.colour || '#f59e0b' }}>
+                {data?.severity || 'MEDIUM'}
+              </span>
+              <span className="text-[9px] text-zinc-600 truncate">{data?.timestamp}</span>
+            </div>
+            <h4 className="text-xs font-bold text-white truncate uppercase">{data?.eventid || 'THREAT-ANALYSIS'}</h4>
+            {data?.analysis?.confidence && (
+              <span className="text-[9px] text-zinc-500 uppercase">confidence: {data.analysis.confidence}</span>
+            )}
+          </div>
         </div>
+        {data?.summary && (
+          <div className="text-[10px] text-zinc-400 leading-relaxed border-l-2 border-zinc-800 pl-3 py-1 italic bg-black/20 rounded-r">
+            {data.summary}
+          </div>
+        )}
+        {hasDetails && (
+          <button
+            onClick={() => setExpanded(prev => !prev)}
+            className="flex items-center gap-1 text-[9px] uppercase font-bold text-zinc-500 hover:text-blue-400 transition-colors duration-200 self-start"
+          >
+            {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+            {expanded ? 'Hide' : 'Show'} MITRE Details
+          </button>
+        )}
       </div>
-      <div className="flex-grow min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-black uppercase" style={{ color: data?.colour || '#f59e0b' }}>
-            {data?.severity || 'MEDIUM'}
-          </span>
-          <span className="text-[9px] text-zinc-600 truncate">{data?.timestamp}</span>
+
+      {expanded && hasDetails && (
+        <div className="border-t border-zinc-900 px-3 pb-3 pt-2 flex flex-col gap-3">
+          {hasMitre && (
+            <div>
+              <div className="flex items-center gap-1 mb-2">
+                <Shield size={10} className="text-blue-400" />
+                <span className="text-[9px] font-black uppercase text-blue-400">MITRE ATT&CK</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {data.mitre_attack.map((attack, idx) => (
+                  <div key={idx} className="bg-black/30 rounded p-2 border border-zinc-800/60">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-[9px] px-1.5 py-0.5 bg-blue-900/40 border border-blue-800/50 rounded text-blue-300 font-mono font-bold">{attack.tactic_id}</span>
+                      <span className="text-[9px] text-zinc-400 font-bold uppercase">{attack.tactic_name}</span>
+                      <ChevronRight size={8} className="text-zinc-600" />
+                      <span className="text-[9px] px-1.5 py-0.5 bg-purple-900/40 border border-purple-800/50 rounded text-purple-300 font-mono font-bold">{attack.technique_id}</span>
+                      <span className="text-[9px] text-zinc-400 font-bold uppercase">{attack.technique_name}</span>
+                    </div>
+                    {attack.evidence && attack.evidence.length > 0 && (
+                      <div className="mt-1.5">
+                        <span className="text-[8px] font-bold uppercase text-zinc-600 block mb-1">Evidence:</span>
+                        {attack.evidence.map((ev, eidx) => (
+                          <div key={eidx} className="text-[9px] font-mono text-emerald-400/80 bg-zinc-950/50 rounded px-2 py-0.5 mb-0.5 truncate">{ev}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {hasMitigations && (
+            <div>
+              <div className="flex items-center gap-1 mb-2">
+                <BookOpen size={10} className="text-amber-400" />
+                <span className="text-[9px] font-black uppercase text-amber-400">Mitigations</span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {data.mitigations.map((mit, idx) => (
+                  <div key={idx} className="bg-black/30 rounded p-2 border border-zinc-800/60">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[9px] px-1.5 py-0.5 bg-amber-900/40 border border-amber-800/50 rounded text-amber-300 font-mono font-bold">{mit.mitigation_id}</span>
+                      <span className="text-[9px] text-zinc-300 font-bold">{mit.mitigation_name}</span>
+                    </div>
+                    <p className="text-[9px] text-zinc-500 leading-relaxed">{mit.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <h4 className="text-xs font-bold text-white truncate uppercase">{data?.eventid || 'THREAT-ANALYSIS'}</h4>
-      </div>
+      )}
     </div>
-    {data?.summary && (
-      <div className="text-[10px] text-zinc-400 leading-relaxed border-l-2 border-zinc-800 pl-3 py-1 italic bg-black/20 rounded-r">
-        {data.summary}
-      </div>
-    )}
-  </div>
-);
+  );
+};
 
 const AttackChainItem = ({ data }) => (
   <div className="mb-4 bg-zinc-950/40 border border-zinc-900 rounded-xl overflow-hidden group/chain hover:border-zinc-700 transition-all duration-300">
