@@ -8,7 +8,7 @@ import {
   Search,
   Database,
 } from 'lucide-react';
-import { Panel, MitreItem, MitigationItem, AgentTicketItem } from './DashboardComponents';
+import { Panel, MitreItem, MitigationItem, AgentTicketItem, FixSuggestionItem } from './DashboardComponents';
 
 export default function FixerDashboard({ 
   nodes, 
@@ -64,7 +64,12 @@ export default function FixerDashboard({
                   Actionable mitigations will appear here
                 </div>
               ) : (
-                latestRisk.mitigations.map((m, i) => <MitigationItem key={i} data={m} />)
+                <>
+                  {latestRisk.mitigations.map((m, i) => <MitigationItem key={i} data={m} />)}
+                  {latestRisk.fix_suggestion && (
+                    <FixSuggestionItem suggestion={latestRisk.fix_suggestion} />
+                  )}
+                </>
               )}
             </Panel>
           </div>
