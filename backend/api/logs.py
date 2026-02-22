@@ -1,6 +1,7 @@
 import json
 import asyncio
 import logging
+from datetime import datetime, timezone
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
@@ -23,7 +24,7 @@ async def stream_cowrie_logs(request: Request):
                 "eventid": "cowrie.session.connect",
                 "src_ip": "192.168.1.100",
                 "message": "New connection attempt detected",
-                "timestamp": "2026-02-21T16:50:00Z"
+                "timestamp": datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
             yield f"data: {json.dumps(demo_data)}\n\n"
             await asyncio.sleep(2)
