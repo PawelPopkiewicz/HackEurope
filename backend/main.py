@@ -35,9 +35,16 @@ async def root():
         "endpoints": [
             "/api/v1/logs/stream",
             "/api/v1/classification/stream",
-            "/api/v1/fixing/stream"
+            "/api/v1/fixing/stream",
+            "/api/v1/dashboard/stream",
+            "/api/v1/dashboard/send_honeypot_json",
         ]
     }
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
