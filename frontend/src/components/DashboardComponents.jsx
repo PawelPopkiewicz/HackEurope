@@ -74,6 +74,24 @@ export const RiskItem = ({ data, active, onClick }) => (
         {data.summary}
       </div>
     )}
+    {data?.attacker_ip && (
+      <div className="text-[9px] text-zinc-500 flex items-center gap-2">
+        <span className="px-1.5 py-0.5 bg-zinc-900 rounded text-[9px] uppercase font-bold">IP</span>
+        <span>{data.attacker_ip}</span>
+      </div>
+    )}
+    {active && data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="mt-1 border-t border-zinc-800 pt-2">
+        <div className="text-[9px] uppercase font-black text-zinc-500 mb-2 tracking-widest">MITRE ATT&amp;CK</div>
+        {data.mitre_attack.map((m, i) => <MitreItem key={m.technique_id || i} data={m} />)}
+      </div>
+    )}
+    {active && data?.mitigations && data.mitigations.length > 0 && (
+      <div className="mt-1 border-t border-zinc-800 pt-2">
+        <div className="text-[9px] uppercase font-black text-zinc-500 mb-2 tracking-widest">MITIGATIONS</div>
+        {data.mitigations.map((m, i) => <MitigationItem key={m.mitigation_id || i} data={m} />)}
+      </div>
+    )}
   </div>
 );
 
