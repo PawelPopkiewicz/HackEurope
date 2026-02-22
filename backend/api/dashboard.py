@@ -6,16 +6,36 @@ Aggregates logs, classifications, and remediation updates.
 import logging
 import json
 import asyncio
+import ipaddress
 from datetime import datetime, timezone
 from typing import AsyncGenerator, Union, List, Dict, Any
 from fastapi import APIRouter, Request, Body
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, field_validator
 
 from backend.api.bus import dashboard_bus
 from backend.constants import SSE_MEDIA_TYPE
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
+
+# M1003 - Firewall: in-memory IP blocklist
+_blocked_ips: set[str] = set()
+
+
+class BlockIpRequest(BaseModel):
+    """Request model for blocking an IP address."""
+    ip: str
+    reason: str = "Suspicious activity detected"
+
+    @field_validator("ip")
+    @classmethod
+    def validate_ip(cls, v: str) -> str:
+        try:
+            ipaddress.ip_address(v)
+        except ValueError:
+            raise ValueError(f"Invalid IP address: {v!r}")
+        return v
 
 
 def _now() -> str:
@@ -157,6 +177,41 @@ async def receive_agent_ticket(ticket: Dict[str, Any] = Body(...)) -> Dict[str, 
     except Exception as e:
         logger.error(f"Failed to receive/emit agent ticket: {e}")
         return {"status": "error", "error": str(e)}
+
+
+@router.post("/block_ip")
+async def block_ip(payload: BlockIpRequest) -> Dict[str, Any]:
+    """
+    Block a suspicious IP address (M1003 - Firewall).
+    Records the IP in the blocklist and broadcasts a block event to dashboard clients.
+    """
+    _blocked_ips.add(payload.ip)
+    event = {
+        "type": "ip_blocked",
+        "ip": payload.ip,
+        "timestamp": _now(),
+        "reason": payload.reason,
+    }
+    await dashboard_bus.emit(event)
+    logger.info(f"IP {payload.ip} blocked. Total blocked IPs: {len(_blocked_ips)}")
+    return {"status": "blocked", "ip": payload.ip, "total_blocked": len(_blocked_ips)}
+
+
+@router.delete("/block_ip/{ip}")
+async def unblock_ip(ip: str) -> Dict[str, Any]:
+    """Remove an IP address from the blocklist."""
+    if ip in _blocked_ips:
+        _blocked_ips.discard(ip)
+        await dashboard_bus.emit({"type": "ip_unblocked", "ip": ip, "timestamp": _now()})
+        logger.info(f"IP {ip} removed from blocklist.")
+        return {"status": "unblocked", "ip": ip}
+    return {"status": "not_found", "ip": ip}
+
+
+@router.get("/blocked_ips")
+async def get_blocked_ips() -> Dict[str, Any]:
+    """Return the current list of blocked IP addresses."""
+    return {"blocked_ips": sorted(_blocked_ips), "count": len(_blocked_ips)}
 
 
 # ── Endpoint: Consolidated Stream ──────────────────────────────────────────────

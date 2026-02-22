@@ -40,6 +40,7 @@ export default function App() {
   const [latestRisk, setLatestRisk] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [agentTickets, setAgentTickets] = useState([]);
+  const [blockedIps, setBlockedIps] = useState([]);
 
   useEffect(() => {
     const source = new EventSource('http://localhost:8000/api/v1/dashboard/stream');
@@ -51,7 +52,7 @@ export default function App() {
         const data = JSON.parse(event.data);
         const type = data.type || (data.eventid ? 'live_log' : null);
 
-        if (type === 'live_log') {
+        if (type === 'live_log' || type === 'brute_force_detected') {
           setLiveLogs(prev => [data, ...prev].slice(0, 20));
           setIsProcessing(true);
         } else if (type === 'risk_score') {
@@ -61,6 +62,8 @@ export default function App() {
           setAttackChains(prev => [data, ...prev].slice(0, 5));
         } else if (type === 'agent_pr' || type === 'agent_ticket') {
           setAgentTickets(prev => [data, ...prev].slice(0, 5));
+        } else if (type === 'ip_blocked') {
+          setBlockedIps(prev => [data.ip, ...prev.filter(ip => ip !== data.ip)].slice(0, 20));
         } else if (type === 'pipeline_finished') {
           setIsProcessing(false);
         }
@@ -99,6 +102,7 @@ export default function App() {
                  latestRisk={latestRisk}
                  setLatestRisk={setLatestRisk}
                  isProcessing={isProcessing}
+                 blockedIps={blockedIps}
                />
             </div>
           </div>
