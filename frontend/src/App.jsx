@@ -3,8 +3,9 @@
  * Entry point with routing and layout
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Terminal } from 'lucide-react';
+import { useNodesState, useEdgesState } from '@xyflow/react';
 import './App.css';
 
 import Sidebar from './components/Sidebar';
@@ -21,6 +22,10 @@ import Analytics from './pages/Analytics';
 import Projects from './pages/Projects';
 import Settings from './pages/Settings';
 
+// Default empty states for the React Flow diagram in the Fixer Agent view
+const initialNodes = [];
+const initialEdges = [];
+
 const NavigationItem = ({ icon: Icon, label, active, onClick }) => (
   <div
     onClick={onClick}
@@ -35,7 +40,7 @@ const NavigationItem = ({ icon: Icon, label, active, onClick }) => (
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeView, setActiveView] = useState('home');
   const [status, setStatus] = useState('Connecting...');
 
   // Lifted Dashboard State
@@ -100,11 +105,8 @@ export default function App() {
         return <Settings />;
       case 'home':
         return <Home />;
-      case 'classification':
-        return <ClassificationDashboard />;
       case 'honeypot':
         return <HoneypotConfig />;
-
       case 'classification':
         return (
           <div className="w-full h-full flex flex-col">
