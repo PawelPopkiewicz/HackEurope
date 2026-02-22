@@ -58,7 +58,12 @@ const RiskItem = ({ data }) => (
           <span className="text-[10px] font-black uppercase" style={{ color: data?.colour || '#f59e0b' }}>
             {data?.severity || 'MEDIUM'}
           </span>
-          <span className="text-[9px] text-zinc-600 truncate">{data?.timestamp}</span>
+          <div className="flex items-center gap-2">
+            {data?.analysis?.confidence && (
+              <span className="text-[9px] text-zinc-500 uppercase">conf: {data.analysis.confidence}</span>
+            )}
+            <span className="text-[9px] text-zinc-600 truncate">{data?.timestamp}</span>
+          </div>
         </div>
         <h4 className="text-xs font-bold text-white truncate uppercase">{data?.eventid || 'THREAT-ANALYSIS'}</h4>
       </div>
@@ -66,6 +71,40 @@ const RiskItem = ({ data }) => (
     {data?.summary && (
       <div className="text-[10px] text-zinc-400 leading-relaxed border-l-2 border-zinc-800 pl-3 py-1 italic bg-black/20 rounded-r">
         {data.summary}
+      </div>
+    )}
+    {data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">MITRE ATT&amp;CK</div>
+        {data.mitre_attack.map((attack, idx) => (
+          <div key={attack.technique_id || idx} className="p-2 bg-black/30 rounded border border-zinc-800/60">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black text-blue-400 uppercase">{attack.tactic_id}</span>
+              <span className="text-[9px] text-zinc-500 uppercase">{attack.tactic_name}</span>
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black text-orange-400 uppercase">{attack.technique_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold truncate">{attack.technique_name}</span>
+            </div>
+            {attack.evidence && attack.evidence.map((ev, eidx) => (
+              <div key={`${attack.technique_id || idx}-${eidx}`} className="text-[9px] text-zinc-500 font-mono truncate pl-2 border-l border-zinc-700">{ev}</div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )}
+    {data?.mitigations && data.mitigations.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <div className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">Mitigations</div>
+        {data.mitigations.map((mit, idx) => (
+          <div key={mit.mitigation_id || idx} className="p-2 bg-black/30 rounded border border-zinc-800/60">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black text-emerald-400 uppercase">{mit.mitigation_id}</span>
+              <span className="text-[9px] text-zinc-300 font-bold truncate">{mit.mitigation_name}</span>
+            </div>
+            <div className="text-[9px] text-zinc-500 leading-relaxed">{mit.description}</div>
+          </div>
+        ))}
       </div>
     )}
   </div>
