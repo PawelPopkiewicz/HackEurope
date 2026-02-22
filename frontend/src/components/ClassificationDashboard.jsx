@@ -61,11 +61,51 @@ const RiskItem = ({ data }) => (
           <span className="text-[9px] text-zinc-600 truncate">{data?.timestamp}</span>
         </div>
         <h4 className="text-xs font-bold text-white truncate uppercase">{data?.eventid || 'THREAT-ANALYSIS'}</h4>
+        {data?.analysis?.confidence && (
+          <span className="text-[9px] text-zinc-500 uppercase">confidence: {data.analysis.confidence}</span>
+        )}
       </div>
     </div>
     {data?.summary && (
       <div className="text-[10px] text-zinc-400 leading-relaxed border-l-2 border-zinc-800 pl-3 py-1 italic bg-black/20 rounded-r">
         {data.summary}
+      </div>
+    )}
+    {data?.mitre_attack && data.mitre_attack.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black uppercase text-zinc-500 tracking-wider">MITRE ATT&amp;CK</span>
+        {data.mitre_attack.map((attack) => (
+          <div key={`${attack.tactic_id}-${attack.technique_id}`} className="pl-2 border-l-2 border-blue-800/60">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[9px] font-bold text-blue-400 bg-blue-950/50 px-1.5 py-0.5 rounded">
+                {attack.tactic_id}
+              </span>
+              <span className="text-[9px] text-zinc-400 uppercase">{attack.tactic_name}</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+              <span className="text-[9px] font-bold text-purple-400 bg-purple-950/50 px-1.5 py-0.5 rounded">
+                {attack.technique_id}
+              </span>
+              <span className="text-[9px] text-zinc-300">{attack.technique_name}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+    {data?.mitigations && data.mitigations.length > 0 && (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[9px] font-black uppercase text-zinc-500 tracking-wider">Mitigations</span>
+        {data.mitigations.map((m, idx) => (
+          <div key={m.mitigation_id || idx} className="pl-2 border-l-2 border-emerald-800/60">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 px-1.5 py-0.5 rounded">
+                {m.mitigation_id}
+              </span>
+              <span className="text-[9px] text-zinc-300">{m.mitigation_name}</span>
+            </div>
+            <div className="text-[9px] text-zinc-500 mt-0.5">{m.description}</div>
+          </div>
+        ))}
       </div>
     )}
   </div>
